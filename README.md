@@ -1,4 +1,4 @@
-# CRUD Manager Pro v2.0
+# DRUD Manager Pro v2.0
 
 Aplicación de terminal modular para gestión de base de datos **MySQL** con:
 pool de conexiones · 3 tablas · DRUD completo · validaciones · log · respaldos JSON · rollback · truncar tablas.
@@ -24,7 +24,7 @@ python main.py
 ## Estructura del proyecto
 
 ```
-Crud_manager/
+drud_manager/
 │
 ├── main.py                        ← Punto de entrada
 │

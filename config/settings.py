@@ -15,8 +15,8 @@ BACKUP_DIR.mkdir(exist_ok=True)
 DB_CONFIG = {
     "host":             "localhost",
     "port":             3306,
-    "user":             "root",
-    "password":         "tu_password",
+     "user":             "mi_usuario",
+    "password":         "123456",
     "database":         "crud_drud",
     "charset":          "utf8mb4",
     "pool_name":        "crud_pool",

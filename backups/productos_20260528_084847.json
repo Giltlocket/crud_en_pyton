@@ -1,0 +1,38 @@
+{
+  "tabla": "productos",
+  "generado_en": "2026-05-28T08:48:47.820589",
+  "total": 3,
+  "tag": "",
+  "registros": [
+    {
+      "id": 2,
+      "nombre": "chetos",
+      "categoria": "botana",
+      "precio": 10.0,
+      "stock": 12,
+      "activo": 1,
+      "creado_en": "2026-05-28T08:06:51",
+      "actualizado": "2026-05-28T08:10:20"
+    },
+    {
+      "id": 3,
+      "nombre": "doritos",
+      "categoria": "frituras",
+      "precio": 12.0,
+      "stock": 12,
+      "activo": 1,
+      "creado_en": "2026-05-28T08:36:15",
+      "actualizado": "2026-05-28T08:36:15"
+    },
+    {
+      "id": 4,
+      "nombre": "fritos",
+      "categoria": "frituras",
+      "precio": 23.0,
+      "stock": 2,
+      "activo": 1,
+      "creado_en": "2026-05-28T08:37:25",
+      "actualizado": "2026-05-28T08:37:25"
+    }
+  ]
+}

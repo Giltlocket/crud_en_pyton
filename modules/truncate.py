@@ -8,11 +8,34 @@ from config import TABLES
 from utils  import log, ok, err, warn, info, prompt, press_enter, separator, C
 
 
-def _truncate_table(table: str):
-    """Trunca una tabla deshabilitando FK temporalmente."""
-    execute("SET FOREIGN_KEY_CHECKS = 0")
-    execute(f"TRUNCATE TABLE {table}")
-    execute("SET FOREIGN_KEY_CHECKS = 1")
+def _tabla_tiene_dependencias(table: str) -> bool:
+    """Indica si una tabla padre tiene registros relacionados en ventas."""
+    if table == "clientes":
+        row = execute("SELECT COUNT(*) AS n FROM ventas v JOIN clientes c ON c.id = v.cliente_id", fetch="one")
+        return bool(row and row["n"] > 0)
+
+    if table == "productos":
+        row = execute("SELECT COUNT(*) AS n FROM ventas v JOIN productos p ON p.id = v.producto_id", fetch="one")
+        return bool(row and row["n"] > 0)
+
+    return False
+
+
+def _vaciar_table(table: str):
+    """
+    Vacía una tabla sin usar TRUNCATE.
+
+    DELETE evita el error 1701 de MySQL/MariaDB cuando una tabla está
+    referenciada por una foreign key.
+    """
+    if _tabla_tiene_dependencias(table):
+        raise RuntimeError(
+            f"No se puede vaciar '{table}' porque tiene ventas relacionadas. "
+            "Primero vacía ventas o usa la opción de vaciar todas las tablas."
+        )
+
+    execute(f"DELETE FROM {table}")
+    execute(f"ALTER TABLE {table} AUTO_INCREMENT = 1")
 
 
 def run():
@@ -35,7 +58,7 @@ def run():
 
     targets = []
     if op == "A":
-        targets = list(TABLES)
+        targets = ["ventas", "productos", "clientes"]
     elif op.isdigit() and 1 <= int(op) <= len(TABLES):
         targets = [TABLES[int(op) - 1]]
     else:
@@ -58,7 +81,7 @@ def run():
 
     for t in targets:
         try:
-            _truncate_table(t)
+            _vaciar_table(t)
             ok(f"Tabla '{t}' truncada.")
             log("TRUNCATE", f"Tabla '{t}' truncada correctamente.")
         except Exception as e:

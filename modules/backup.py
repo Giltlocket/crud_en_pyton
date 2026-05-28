@@ -4,6 +4,7 @@ modules/backup.py  —  Respaldo JSON por tabla y restauración (rollback).
 
 import json
 import datetime
+from decimal import Decimal
 
 from db     import execute
 from config import TABLES, BACKUP_DIR
@@ -15,13 +16,24 @@ from utils  import (log, ok, err, warn, info,
 #  HELPERS
 # ─────────────────────────────────────────────────────────────
 
+def _json_safe_value(value):
+    """Convierte valores de MySQL/Python a tipos compatibles con JSON."""
+    if isinstance(value, Decimal):
+        return float(value)
+
+    if isinstance(value, (datetime.datetime, datetime.date, datetime.time)):
+        return value.isoformat()
+
+    return value
+
+
 def _rows_to_json(table: str) -> list[dict]:
     rows = execute(f"SELECT * FROM {table} ORDER BY id", fetch="all")
     clean = []
     for r in rows:
         row = {}
         for k, v in r.items():
-            row[k] = v.isoformat() if hasattr(v, "isoformat") else v
+            row[k] = _json_safe_value(v)
         clean.append(row)
     return clean
 
@@ -47,6 +59,36 @@ def _save_file(table: str, rows: list, tag: str = "") -> tuple[bool, str]:
 def _list_files(table: str = "") -> list:
     pattern = f"{table}_*.json" if table else "*.json"
     return sorted(BACKUP_DIR.glob(pattern), reverse=True)
+
+
+def _tabla_tiene_dependencias(table: str) -> bool:
+    """Indica si la tabla padre tiene registros usados en ventas."""
+    if table == "clientes":
+        row = execute("SELECT COUNT(*) AS n FROM ventas v JOIN clientes c ON c.id = v.cliente_id", fetch="one")
+        return bool(row and row["n"] > 0)
+
+    if table == "productos":
+        row = execute("SELECT COUNT(*) AS n FROM ventas v JOIN productos p ON p.id = v.producto_id", fetch="one")
+        return bool(row and row["n"] > 0)
+
+    return False
+
+
+def _vaciar_tabla_seguro(table: str) -> None:
+    """
+    Vacía una tabla sin usar TRUNCATE.
+
+    TRUNCATE falla en tablas referenciadas por foreign keys aunque no tengan registros.
+    DELETE respeta las relaciones y permite limpiar clientes/productos cuando no hay ventas asociadas.
+    """
+    if _tabla_tiene_dependencias(table):
+        raise RuntimeError(
+            f"No se puede reemplazar '{table}' porque hay ventas relacionadas. "
+            "Primero respalda/restaura ventas o elimina esas ventas."
+        )
+
+    execute(f"DELETE FROM {table}")
+    execute(f"ALTER TABLE {table} AUTO_INCREMENT = 1")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -205,14 +247,13 @@ def rollback():
     # ── Ejecutar ──────────────────────────────────────────────
     try:
         if modo == "r":
-            execute("SET FOREIGN_KEY_CHECKS = 0")
-            execute(f"TRUNCATE TABLE {table}")
-            execute("SET FOREIGN_KEY_CHECKS = 1")
+            _vaciar_tabla_seguro(table)
 
         insertados = 0
         for rec in registros:
-            # Excluir campos autogenerados
-            skip = {"id", "creado_en", "actualizado", "total"}
+            # Excluir solo campos generados por la BD.
+            # Conservamos el id para que ventas.cliente_id y ventas.producto_id sigan apuntando bien.
+            skip = {"total"}
             cols = [k for k in rec if k not in skip]
             vals = [rec[k] for k in cols]
             ph   = ", ".join(["%s"] * len(cols))

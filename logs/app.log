@@ -1,0 +1,19 @@
+2026-05-28 08:48:07 | INFO     | package: mysql.connector.plugins
+2026-05-28 08:48:07 | INFO     | plugin_name: mysql_native_password
+2026-05-28 08:48:07 | INFO     | AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-05-28 08:48:07 | INFO     | [POOL] Pool 'crud_pool' iniciado (size=5).
+2026-05-28 08:48:07 | INFO     | [INIT] 3 tablas verificadas/creadas: productos, clientes, ventas.
+2026-05-28 08:48:07 | INFO     | [SYSTEM] DRUD Manager Pro v2.0.0 iniciado.
+2026-05-28 08:48:16 | INFO     | [READ] productos — 3 registros
+2026-05-28 08:48:47 | INFO     | [BACKUP] Exportación OK — productos | 3 reg. → /home/adriango/Descargas/crud_pro2_corregido/backups/productos_20260528_084847.json (tag=—)
+2026-05-28 08:49:29 | INFO     | [TRUNCATE] Tabla 'productos' truncada correctamente.
+2026-05-28 08:49:34 | INFO     | [SYSTEM] Aplicación cerrada.
+2026-05-28 08:49:38 | INFO     | package: mysql.connector.plugins
+2026-05-28 08:49:38 | INFO     | plugin_name: mysql_native_password
+2026-05-28 08:49:38 | INFO     | AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2026-05-28 08:49:38 | INFO     | [POOL] Pool 'crud_pool' iniciado (size=5).
+2026-05-28 08:49:38 | INFO     | [INIT] 3 tablas verificadas/creadas: productos, clientes, ventas.
+2026-05-28 08:49:38 | INFO     | [SYSTEM] DRUD Manager Pro v2.0.0 iniciado.
+2026-05-28 08:49:52 | INFO     | [BACKUP] Exportación OK — productos | 0 reg. → /home/adriango/Descargas/crud_pro2_corregido/backups/productos_20260528_084952.json (tag=—)
+2026-05-28 08:50:16 | INFO     | [READ] Historial consultado — últimas 50 (filtro: ninguno)
+2026-05-28 08:50:35 | INFO     | [SYSTEM] Interrumpido por teclado.
